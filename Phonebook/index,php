@@ -1,0 +1,79 @@
+<?php
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    
+    $name = $_POST['name'];
+    $phone = $_POST['phone'];
+    $email = $_POST['email'];
+
+    
+    $file = fopen("contacts.txt", "a");
+    if ($file) {
+        
+        fwrite($file, "$name,$phone,$email\n");
+        fclose($file);
+    }
+}
+
+
+$contacts = [];
+if (file_exists('contacts.txt')) {
+    $file = fopen("contacts.txt", "r");
+    while (($line = fgets($file)) !== false) {
+        
+        $contacts[] = explode(",", trim($line));
+    }
+    fclose($file);
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonebook</title>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Phonebook</h1>
+
+       
+        <form method="POST" action="">
+            <h2>Add Contact</h2>
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" required placeholder="Enter name">
+            <label for="phone">Phone:</label>
+            <input type="text" name="phone" id="phone" required placeholder="Enter phone number">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required placeholder="Enter email address">
+            <input type="submit" value="Add Contact">
+        </form>
+
+        
+        <h2>Saved Contacts</h2>
+        <?php if (count($contacts) > 0): ?>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                </tr>
+                <?php foreach ($contacts as $contact): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($contact[0]); ?></td>
+                        <td><?php echo htmlspecialchars($contact[1]); ?></td>
+                        <td><?php echo htmlspecialchars($contact[2]); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        <?php else: ?>
+            <p class="no-contacts">No contacts saved yet.</p>
+        <?php endif; ?>
+    </div>
+
+</body>
+</html>
